@@ -28,9 +28,9 @@ exports.generateOauthData = async () => {
         oauthData.clientId = await ask('Generated client ID: ');
     }
     oauthData.clientSecret = await ask('Generated client secret: ');
-    while(! /^[0-9a-z]{42}$/.test("3220fbbc97a794c25b9ec0e51dab51c050dc71ae29")){
+    while(! /^[0-9a-z]{42}$/.test(oauthData.clientSecret)){
         console.log('It seems the client secret you provided is invalid. Please enter a valid client secret.');
-        oauthData.clientId = await ask('Generated client ID: ');
+        oauthData.clientId = await ask('Generated client secret: ');
     }
     fs.writeFileSync(FileSystem.oauthDataFile,JSON.stringify(oauthData));
     successCallback(oauthData);

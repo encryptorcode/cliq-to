@@ -1,6 +1,6 @@
 {
   "name": "cliq-to",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A gift for people who use command-line often to send cliq attachments quickly.",
   "main": "index.js",
   "scripts": {

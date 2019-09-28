@@ -1,5 +1,6 @@
 const fs = require('fs'),
     request = require('request'),
+    cliProgress = require('cli-progress'),
     generateOauthData = require('./generateOauthData').generateOauthData,
     generateTokenData = require('./generateTokenData').generateTokenData;
 
@@ -29,7 +30,7 @@ exports.accessTokenFetcher = {
                     tokenDataPromise = generateTokenData(oauthData);
                 } else {
                     tokenDataPromise = new Promise(function(resolve){
-                            resolve(JSON.parse(dataBuffer.toString()));
+                        resolve(JSON.parse(dataBuffer.toString()));
                     });
                 }
             }
@@ -71,6 +72,20 @@ function regenerateAccessTokenIfRequired(oauthData, tokenData) {
     if(!oauthData.clientId || !oauthData.clientSecret || !oauthData.tokenUrl){
         oauthData = generateOauthData();
     }
+    
+    let progress = 0;
+    let progressBar = new cliProgress.Bar({
+        format: 'Re-generating refresh token {bar} {percentage}%'
+    }, cliProgress.Presets.shades_classic);
+    progressBar.start(100, 1);
+    let progressUpdate = setInterval(() => {
+        if(progress < 80){
+            progress += 10;
+            progressBar.update(progress);
+        } else {
+            clearInterval(progressUpdate);
+        }
+    }, 100);
 
     return new Promise((resolve, reject) => {
         request({
@@ -84,6 +99,7 @@ function regenerateAccessTokenIfRequired(oauthData, tokenData) {
                 grant_type : 'refresh_token'
             }
         },(error,status,body) => {
+            progressBar.update(100);
             if(error){
                 reject("Failed to re-generate access token.",error,status,body);
             } else {

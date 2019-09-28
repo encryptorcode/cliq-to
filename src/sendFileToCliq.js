@@ -54,7 +54,7 @@ exports.sendFileToCliq = (recipientData,accessTokenFetcher,filePath) => {
         var uploadedSize = 0;
         let progressBar = new cliProgress.Bar({
             format: 'Uploading {bar} {percentage}%'
-        },cliProgress.Presets.rect);
+        },cliProgress.Presets.shades_classic);
         progressBar.start(totalFileSize,uploadedSize);
         request({
             url : url,
@@ -70,17 +70,22 @@ exports.sendFileToCliq = (recipientData,accessTokenFetcher,filePath) => {
                     progressBar.update(uploadedSize*0.8);
                 })
             }
-        },(error,responseMessage)=>{
+        },(error,res)=>{
             progressBar.update(totalFileSize);
             progressBar.stop();
-            if(error || parseInt(responseMessage.statusCode/100 != 2)){
-                console.log("Failed to send the file.");
-                console.log("Reponse details:");
-                console.log("status: "+responseMessage.statusCode);
-                console.log("body: "+responseMessage.body);
+            if(error){
+                console.log('Something happened. Please report this error on https://github.com/encryptorcode/cliq-to/issues');
+                console.error(error);
+            } else if (res.statusCode == 200) {
+                console.log("File uploaded successfully.");
+            } else if (res.statusCode == 401) {
+                console.log('Authentication Error. Please try to re-run the command.');
+                fs.unlinkSync(global.FileSystem.tokenDataFile);
             } else {
-                console.log("File uploaded successfully.")
+                console.log('Something happened. Please report this error on https://github.com/encryptorcode/cliq-to/issues');
             }
+            // FIXME: need to find out the actual root cause of process not exiting.
+            process.exit();
         });
     });
 }
