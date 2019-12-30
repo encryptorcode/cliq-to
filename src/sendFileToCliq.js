@@ -76,7 +76,7 @@ exports.sendFileToCliq = (recipientData,accessTokenFetcher,filePath) => {
             if(error){
                 console.log('Something happened. Please report this error on https://github.com/encryptorcode/cliq-to/issues');
                 console.error(error);
-            } else if (res.statusCode == 200) {
+            } else if (res.statusCode == 200 || res.statusCode == 204) {
                 console.log("File uploaded successfully.");
             } else if (res.statusCode == 401) {
                 console.log('Authentication Error. Please try to re-run the command.');
